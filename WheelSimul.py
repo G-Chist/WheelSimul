@@ -70,6 +70,9 @@ def draw_robot(cx, cy, tilt, trajectory=False, trajlen=500):
                    [cx - r_size_x*Sin(alpha), cy - r_size_y*Cos(alpha)],
                    [cx - r_size_x*Cos(alpha), cy + r_size_y*Sin(alpha)]]
 
+    for i in robot_edges:
+        i = [Clip(i[0], 0, 600), Clip(i[1], 0, 600)]
+
     if not trajectory:
         field.delete(robotcenter[-1])
 
@@ -124,7 +127,7 @@ def apply_vector(object, strength, angle):
 
     strength = strength*3
 
-    beta = -angle
+    beta = -angle % 360
 
     if object == robotcenter:
         delta_a = 0
@@ -137,7 +140,6 @@ working = True
 
 start_time = time.time()
 delta_time = 0
-print(start_time)
 
 #Движение робота
 while working:
@@ -145,10 +147,8 @@ while working:
         curr_time = time.time()
         delta_time = curr_time - start_time
 
-        if delta_time < 1:
-            apply_vector(robotcenter, 1, 0)
-        if delta_time > 1 and delta_time < 2:
-            apply_vector(robotcenter, 0.5, -135)
+        if int(delta_time) % 4 == 0:
+            apply_vector(robotcenter, 1, 135)
 
         draw_robot(rx+delta_x, ry+delta_y, 0, trajectory=True, trajlen=200)
 
