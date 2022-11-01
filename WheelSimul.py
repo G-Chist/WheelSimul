@@ -59,9 +59,18 @@ delta_x = 0
 delta_y = 0
 delta_a = 0
 
+#Углы робота
+robot_edges = [[0, 0],
+               [0, 0],
+               [0, 0],
+               [0, 0]]
+
+#Рисунок вектора
+vector = field.create_line(0, 0, 0, 0)
+
 #Функция рисования робота
 def draw_robot(cx, cy, tilt, trajectory=False, trajlen=500):
-    global robot, robotcenter, robotfront, wheel_nw, wheel_ne, wheel_se, wheel_sw, delta_x, delta_y, delta_a, rx, ry
+    global robot, robotcenter, robotfront, wheel_nw, wheel_ne, wheel_se, wheel_sw, delta_x, delta_y, delta_a, rx, ry, robot_edges, vector
 
     alpha = -tilt-45
 
@@ -70,8 +79,9 @@ def draw_robot(cx, cy, tilt, trajectory=False, trajlen=500):
                    [cx - r_size_x*Sin(alpha), cy - r_size_y*Cos(alpha)],
                    [cx - r_size_x*Cos(alpha), cy + r_size_y*Sin(alpha)]]
 
+    robot_edges_clipped = []
     for i in robot_edges:
-        i = [Clip(i[0], 0, 600), Clip(i[1], 0, 600)]
+        robot_edges_clipped.append([Clip(i[0], 0, 600), Clip(i[1], 0, 600)])
 
     if not trajectory:
         field.delete(robotcenter[-1])
@@ -85,6 +95,7 @@ def draw_robot(cx, cy, tilt, trajectory=False, trajlen=500):
     field.delete(wheel_ne)
     field.delete(wheel_se)
     field.delete(wheel_sw)
+    field.delete(vector)
 
     robot = field.create_polygon(cx + r_size_x*Sin(alpha), cy + r_size_y*Cos(alpha),
                                  cx + r_size_x*Cos(alpha), cy - r_size_y*Sin(alpha),
@@ -116,6 +127,13 @@ def draw_robot(cx, cy, tilt, trajectory=False, trajlen=500):
                                  cx + r_size_x * Sin(alpha) + 4, cy + r_size_y * Cos(alpha) + 4,
                                  fill="black")
 
+    dx = cx - rx
+    dy = cy - ry
+
+    vector = field.create_line(rx, ry,
+                               rx + dx * 60, ry + dy * 60,
+                               fill="blue", arrow=tk.LAST)
+
     rx = cx
     ry = cy
 
@@ -123,7 +141,7 @@ def draw_robot(cx, cy, tilt, trajectory=False, trajlen=500):
 
 #Функция движения робота
 def apply_vector(object, strength, angle):
-    global robot, robotcenter, robotfront, wheel_nw, wheel_ne, wheel_se, wheel_sw, delta_x, delta_y, delta_a, rx, ry
+    global robot, robotcenter, robotfront, wheel_nw, wheel_ne, wheel_se, wheel_sw, delta_x, delta_y, delta_a, rx, ry, robot_edges, vector
 
     strength = strength*3
 
@@ -141,20 +159,26 @@ working = True
 start_time = time.time()
 delta_time = 0
 
+c = 50
+k = 1
 #Движение робота
 while working:
     try:
+        c += k
+        if c > 400:
+            k = -1
+        if c < 50:
+            k = 1
+
         curr_time = time.time()
         delta_time = curr_time - start_time
 
-        if int(delta_time) % 4 == 0:
-            apply_vector(robotcenter, 1, 135)
-
-        draw_robot(rx+delta_x, ry+delta_y, 0, trajectory=True, trajlen=200)
+        draw_robot(c, 200+Sin(c)*100, c, trajectory=True, trajlen=200)
 
         delta_x = 0
         delta_y = 0
 
         root.update()
+
     except tk.TclError:
         working = False
