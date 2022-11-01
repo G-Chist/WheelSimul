@@ -37,10 +37,12 @@ r_size = 30
 
 #Рисунок робота
 robot = field.create_rectangle(startx-r_size, starty-r_size, startx+r_size, starty+r_size)
+robotcenter = field.create_oval(0, 0, 0, 0)
 robotfront = field.create_line(0, 0, 0, 0)
 def draw_robot(cx, cy, tilt):
-    global robot, robotfront
+    global robot, robotcenter, robotfront
     field.delete(robot)
+    field.delete(robotcenter)
     field.delete(robotfront)
     alpha = -tilt-45
     robot = field.create_polygon(cx + r_size*Sin(alpha), cy + r_size*Cos(alpha),
@@ -48,6 +50,9 @@ def draw_robot(cx, cy, tilt):
                                  cx - r_size*Sin(alpha), cy - r_size*Cos(alpha),
                                  cx - r_size*Cos(alpha), cy + r_size*Sin(alpha),
                                  fill="", outline="black", width=3)
+    robotcenter = field.create_oval(cx + 2, cy + 2,
+                                    cx - 2, cy - 2,
+                                    fill="black")
     robotfront = field.create_line(cx - r_size*Sin(alpha), cy - r_size*Cos(alpha),
                                    cx - r_size*Cos(alpha), cy + r_size*Sin(alpha),
                                    width=4, fill="green")
