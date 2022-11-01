@@ -37,25 +37,61 @@ r_size = 30
 
 #Рисунок робота
 robot = field.create_rectangle(startx-r_size, starty-r_size, startx+r_size, starty+r_size)
-robotcenter = field.create_oval(0, 0, 0, 0)
+robotcenter = [field.create_oval(0, 0, 0, 0)]
 robotfront = field.create_line(0, 0, 0, 0)
-def draw_robot(cx, cy, tilt):
-    global robot, robotcenter, robotfront
+
+wheel_nw = field.create_line(0, 0, 0, 0)
+wheel_ne = field.create_line(0, 0, 0, 0)
+wheel_se = field.create_line(0, 0, 0, 0)
+wheel_sw = field.create_line(0, 0, 0, 0)
+def draw_robot(cx, cy, tilt, trajectory=False, traj_len=500):
+    global robot, robotcenter, robotfront, wheel_nw, wheel_ne, wheel_se, wheel_sw
+
     field.delete(robot)
-    field.delete(robotcenter)
     field.delete(robotfront)
+
+    if not trajectory:
+        field.delete(robotcenter[-1])
+
+    if len(robotcenter) >= traj_len:
+        field.delete(robotcenter[-traj_len])
+
+    field.delete(wheel_nw)
+    field.delete(wheel_ne)
+    field.delete(wheel_se)
+    field.delete(wheel_sw)
+
     alpha = -tilt-45
+
     robot = field.create_polygon(cx + r_size*Sin(alpha), cy + r_size*Cos(alpha),
                                  cx + r_size*Cos(alpha), cy - r_size*Sin(alpha),
                                  cx - r_size*Sin(alpha), cy - r_size*Cos(alpha),
                                  cx - r_size*Cos(alpha), cy + r_size*Sin(alpha),
                                  fill="", outline="black", width=3)
-    robotcenter = field.create_oval(cx + 2, cy + 2,
+
+    robotcenter.append(field.create_oval(cx + 2, cy + 2,
                                     cx - 2, cy - 2,
-                                    fill="black")
+                                    fill="red", outline="red"))
+
     robotfront = field.create_line(cx - r_size*Sin(alpha), cy - r_size*Cos(alpha),
                                    cx - r_size*Cos(alpha), cy + r_size*Sin(alpha),
                                    width=4, fill="green")
+
+    wheel_nw = field.create_oval(cx + r_size * Cos(alpha) - 4, cy - r_size * Sin(alpha) - 4,
+                                 cx + r_size * Cos(alpha) + 4, cy - r_size * Sin(alpha) + 4,
+                                 fill="black")
+
+    wheel_ne = field.create_oval(cx - r_size * Sin(alpha) - 4, cy - r_size * Cos(alpha) - 4,
+                                 cx - r_size * Sin(alpha) + 4, cy - r_size * Cos(alpha) + 4,
+                                 fill="black")
+
+    wheel_se = field.create_oval(cx - r_size * Cos(alpha) - 4, cy + r_size * Sin(alpha) - 4,
+                                 cx - r_size * Cos(alpha) + 4, cy + r_size * Sin(alpha) + 4,
+                                 fill="black")
+
+    wheel_sw = field.create_oval(cx + r_size*Sin(alpha) - 4, cy + r_size*Cos(alpha) - 4,
+                                 cx + r_size*Sin(alpha) + 4, cy + r_size*Cos(alpha) + 4,
+                                 fill="black")
     time.sleep(0.0001)
 
 working = True
@@ -65,9 +101,12 @@ k = 1
 c = 50
 while working:
     c += 1*k
-    if c >= 400:
+    if c >= 500:
         k = -1
     if c <= 50:
         k = 1
-    draw_robot(c, c, c)
-    root.update()
+    try:
+        draw_robot(c, 200+Sin(c)*50, c, trajectory=True)
+        root.update()
+    except tk.TclError:
+        working = False
