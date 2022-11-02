@@ -18,7 +18,47 @@ def Sin(a):
 def Cos(a):
     return math.cos(math.radians(a))
 
-#Окно
+#Окно ввода движений
+input_root = tk.Tk()
+input_root.geometry("1000x600")
+input_root.title("WheelSimul")
+
+#Рисунок поля
+input_field = tk.Canvas(input_root, width=600, height=600, bd=0, bg="#8c8c8c", highlightthickness=0)
+input_field.place(x=0, y=0)
+
+#Размер сетки
+grid = 6
+
+#Рисунок сетки на поле
+for i in range(grid):
+    tile = 600/grid
+    input_field.create_line(0, tile*i, 600, tile*i, width=1, fill="#434343")
+    input_field.create_line(tile*i, 0, tile*i, 600, width=1, fill="#434343")
+
+#Предыдущие координаты
+prevx = 0
+prevy = 0
+
+#Счётчик нажатий
+clicknum = 0
+
+#Функция ввода точки
+def input_point(event):
+    global clicknum, prevx, prevy, input_field
+    print("Точка введена")
+
+input_field.bind("<Button-1>", input_point)
+
+#ЦИКЛ РАЗМЕТКИ ТРАЕКТОРИИ
+planned = False
+while not planned:
+    try:
+        input_root.update()
+    except tk.TclError:
+        planned = True
+
+#Окно движений
 root = tk.Tk()
 root.geometry("1000x600")
 root.title("WheelSimul")
