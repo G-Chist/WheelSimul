@@ -43,12 +43,32 @@ prevy = 0
 #Счётчик нажатий
 clicknum = 0
 
+#Массив с точками
+point_arr = []
+
 #Функция ввода точки
 def input_point(event):
+    
     global clicknum, prevx, prevy, input_field
-    print("Точка введена")
+    
+    x, y = event.x, event.y
+    
+    clicknum += 1
+    if clicknum >= 2:
+        input_field.create_line(prevx, prevy, x, y, fill="red", width=3)
+    input_field.create_oval(x+7, y+7, x-7, y-7, fill="red")
+        
+    point_arr.append([x, y])
+    print("Точка (" + str(x) + "; " + str(y) + ") введена")
+
+    prevx = x
+    prevy = y
 
 input_field.bind("<Button-1>", input_point)
+
+#______________________________________________________________________________________________________________________________________________________________________
+#______________________________________________________________________________________________________________________________________________________________________
+#______________________________________________________________________________________________________________________________________________________________________
 
 #ЦИКЛ РАЗМЕТКИ ТРАЕКТОРИИ
 planned = False
@@ -109,7 +129,7 @@ robot_edges = [[0, 0],
 vector = field.create_line(0, 0, 0, 0)
 
 #Функция рисования робота
-def draw_robot(cx, cy, tilt, trajectory=False, trajlen=500):
+def draw_robot(cx, cy, tilt=0, trajectory=False, trajlen=500):
     global robot, robotcenter, robotfront, wheel_nw, wheel_ne, wheel_se, wheel_sw, delta_x, delta_y, delta_a, rx, ry, robot_edges, vector
 
     alpha = -tilt-45
@@ -213,7 +233,7 @@ while working:
         curr_time = time.time()
         delta_time = curr_time - start_time
 
-        draw_robot(c, 200+Sin(c)*100, c, trajectory=True, trajlen=200)
+        draw_robot(c, 200+Sin(c)*100, trajectory=True, trajlen=400)
 
         delta_x = 0
         delta_y = 0
