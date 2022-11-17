@@ -18,6 +18,28 @@ def Sin(a):
 def Cos(a):
     return math.cos(math.radians(a))
 
+#Арктангенс в градусах
+def Arctg(a):
+    return math.degrees(math.atan(a))
+
+#Получение угла через дельта x и дельта y
+def get_ang(delt_x, delt_y):
+    
+    if delt_x == 0:
+        if delt_y < 0:
+            ang = 0
+        if delt_y > 0:
+            ang = 180
+
+    if delt_x < 0:
+        ang = 270 - Arctg(-delt_y/delt_x)
+
+    if delt_x > 0:
+        ang = 90 - Arctg(-delt_y/delt_x)
+
+    return ang
+    
+
 #Окно ввода движений
 input_root = tk.Tk()
 input_root.geometry("1000x600")
@@ -66,10 +88,6 @@ def input_point(event):
 
 input_field.bind("<Button-1>", input_point)
 
-#______________________________________________________________________________________________________________________________________________________________________
-#______________________________________________________________________________________________________________________________________________________________________
-#______________________________________________________________________________________________________________________________________________________________________
-
 #ЦИКЛ РАЗМЕТКИ ТРАЕКТОРИИ
 planned = False
 while not planned:
@@ -77,6 +95,12 @@ while not planned:
         input_root.update()
     except tk.TclError:
         planned = True
+
+print(point_arr)
+
+#______________________________________________________________________________________________________________________________________________________________________
+#______________________________________________________________________________________________________________________________________________________________________
+#______________________________________________________________________________________________________________________________________________________________________
 
 #Окно движений
 root = tk.Tk()
@@ -203,7 +227,7 @@ def draw_robot(cx, cy, tilt=0, trajectory=False, trajlen=500):
 def apply_vector(object, strength, angle):
     global robot, robotcenter, robotfront, wheel_nw, wheel_ne, wheel_se, wheel_sw, delta_x, delta_y, delta_a, rx, ry, robot_edges, vector
 
-    strength = strength*3
+    strength = strength * 2
 
     beta = -angle % 360
 
@@ -219,21 +243,17 @@ working = True
 start_time = time.time()
 delta_time = 0
 
-c = 50
-k = 1
 #Движение робота
 while working:
     try:
-        c += k
-        if c > 400:
-            k = -1
-        if c < 50:
-            k = 1
+        k = 1
 
         curr_time = time.time()
         delta_time = curr_time - start_time
 
-        draw_robot(c, 200+Sin(c)*100, trajectory=True, trajlen=400)
+        apply_vector(robotcenter, 1, -170)
+
+        draw_robot(rx+delta_x, ry+delta_y, trajectory=True, trajlen=400)
 
         delta_x = 0
         delta_y = 0
